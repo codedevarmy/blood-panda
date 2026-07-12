@@ -1,0 +1,24 @@
+.DS_Store
+.env*
+node_modules
+
+# React Router
+.react-router
+build
+
+# typescript
+*.tsbuildinfo
+
+# content-collections
+.content-collections
+
+# local development
+/docs
+
+.qodo
+
+# Prisma
+/app/generated/prisma
+
+# Vercel
+.vercel
