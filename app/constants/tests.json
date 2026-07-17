@@ -428,7 +428,7 @@
       "kidney-health": [
         {
           "id": "f915439d-ae8f-4b00-8242-1d6c96bbc9fb",
-          "testName": "Renal Function Test (RFT)",
+          "testName": "Renal Function Test (RFT) Test",
           "orgPrice": "700",
           "disPrice": "500"
         },

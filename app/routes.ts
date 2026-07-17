@@ -48,10 +48,13 @@ export default [
   // Auth API route
   route("/api/auth/*", "routes/api.auth.$.ts"),
 
+  // Save API route
+  route("/api/save", "routes/api.save.ts"),
+
   layout("routes/private/layout.tsx", [
     route("cart", "routes/private/cart.tsx"),
     route("profile", "routes/private/profile.tsx"),
-    route("booking", "routes/private/booking.tsx"),
+    route("booking", "routes/private/booking.tsx", { id: "booking" }),
   ]),
 
   layout("routes/admin/layout.tsx", [

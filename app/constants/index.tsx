@@ -744,3 +744,13 @@ export const faqs = [
       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magni architecto repellendus repellat nemo dolorem? Obcaecati consequatur voluptatibus laboriosam expedita vel accusamus debitis dicta eius! Distinctio ad iusto porro reiciendis laboriosam!",
   },
 ]
+
+export const GenderEnums = ["MALE", "FEMALE", "OTHER"] as const
+
+export const AddressTypeEnums = ["HOME", "OFFICE"] as const
+
+export const ScheduleStatusEnums = [
+  "PENDING",
+  "CONFIRMED",
+  "CANCELLED",
+] as const

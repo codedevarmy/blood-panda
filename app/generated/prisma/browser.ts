@@ -42,3 +42,53 @@ export type Verification = Prisma.VerificationModel
  * 
  */
 export type Post = Prisma.PostModel
+/**
+ * Model PrimaryCategory
+ * 
+ */
+export type PrimaryCategory = Prisma.PrimaryCategoryModel
+/**
+ * Model SecondaryCategory
+ * 
+ */
+export type SecondaryCategory = Prisma.SecondaryCategoryModel
+/**
+ * Model BloodTest
+ * 
+ */
+export type BloodTest = Prisma.BloodTestModel
+/**
+ * Model Package
+ * 
+ */
+export type Package = Prisma.PackageModel
+/**
+ * Model PackageCategory
+ * 
+ */
+export type PackageCategory = Prisma.PackageCategoryModel
+/**
+ * Model MiniPackage
+ * 
+ */
+export type MiniPackage = Prisma.MiniPackageModel
+/**
+ * Model Booking
+ * 
+ */
+export type Booking = Prisma.BookingModel
+/**
+ * Model Member
+ * 
+ */
+export type Member = Prisma.MemberModel
+/**
+ * Model Address
+ * 
+ */
+export type Address = Prisma.AddressModel
+/**
+ * Model Schedule
+ * 
+ */
+export type Schedule = Prisma.ScheduleModel

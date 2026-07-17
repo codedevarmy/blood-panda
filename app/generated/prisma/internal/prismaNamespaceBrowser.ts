@@ -55,7 +55,17 @@ export const ModelName = {
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
-  Post: 'Post'
+  Post: 'Post',
+  PrimaryCategory: 'PrimaryCategory',
+  SecondaryCategory: 'SecondaryCategory',
+  BloodTest: 'BloodTest',
+  Package: 'Package',
+  PackageCategory: 'PackageCategory',
+  MiniPackage: 'MiniPackage',
+  Booking: 'Booking',
+  Member: 'Member',
+  Address: 'Address',
+  Schedule: 'Schedule'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -148,6 +158,149 @@ export const PostScalarFieldEnum = {
 } as const
 
 export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
+
+
+export const PrimaryCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PrimaryCategoryScalarFieldEnum = (typeof PrimaryCategoryScalarFieldEnum)[keyof typeof PrimaryCategoryScalarFieldEnum]
+
+
+export const SecondaryCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SecondaryCategoryScalarFieldEnum = (typeof SecondaryCategoryScalarFieldEnum)[keyof typeof SecondaryCategoryScalarFieldEnum]
+
+
+export const BloodTestScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  originalPrice: 'originalPrice',
+  discountedPrice: 'discountedPrice',
+  discountAmount: 'discountAmount',
+  isFastingRequired: 'isFastingRequired',
+  primaryCategoryId: 'primaryCategoryId',
+  secondaryCategoryId: 'secondaryCategoryId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  memberId: 'memberId'
+} as const
+
+export type BloodTestScalarFieldEnum = (typeof BloodTestScalarFieldEnum)[keyof typeof BloodTestScalarFieldEnum]
+
+
+export const PackageScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  cover: 'cover',
+  originalAmount: 'originalAmount',
+  discountedAmount: 'discountedAmount',
+  offerAmount: 'offerAmount',
+  extraFeatures: 'extraFeatures',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PackageScalarFieldEnum = (typeof PackageScalarFieldEnum)[keyof typeof PackageScalarFieldEnum]
+
+
+export const PackageCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  features: 'features',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  packageId: 'packageId'
+} as const
+
+export type PackageCategoryScalarFieldEnum = (typeof PackageCategoryScalarFieldEnum)[keyof typeof PackageCategoryScalarFieldEnum]
+
+
+export const MiniPackageScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  cover: 'cover',
+  benefits: 'benefits',
+  originalAmount: 'originalAmount',
+  discountedAmount: 'discountedAmount',
+  offerAmount: 'offerAmount',
+  extraFeatures: 'extraFeatures',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MiniPackageScalarFieldEnum = (typeof MiniPackageScalarFieldEnum)[keyof typeof MiniPackageScalarFieldEnum]
+
+
+export const BookingScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  status: 'status',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  addressId: 'addressId',
+  scheduleId: 'scheduleId'
+} as const
+
+export type BookingScalarFieldEnum = (typeof BookingScalarFieldEnum)[keyof typeof BookingScalarFieldEnum]
+
+
+export const MemberScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  phone: 'phone',
+  gender: 'gender',
+  age: 'age',
+  bookingId: 'bookingId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MemberScalarFieldEnum = (typeof MemberScalarFieldEnum)[keyof typeof MemberScalarFieldEnum]
+
+
+export const AddressScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  location: 'location',
+  houseNo: 'houseNo',
+  landmark: 'landmark',
+  pinCode: 'pinCode',
+  streetAddress: 'streetAddress',
+  city: 'city',
+  state: 'state',
+  country: 'country',
+  bookingId: 'bookingId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AddressScalarFieldEnum = (typeof AddressScalarFieldEnum)[keyof typeof AddressScalarFieldEnum]
+
+
+export const ScheduleScalarFieldEnum = {
+  id: 'id',
+  scheduleDate: 'scheduleDate',
+  slot: 'slot',
+  scheduleStatus: 'scheduleStatus',
+  bookingId: 'bookingId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ScheduleScalarFieldEnum = (typeof ScheduleScalarFieldEnum)[keyof typeof ScheduleScalarFieldEnum]
 
 
 export const SortOrder = {

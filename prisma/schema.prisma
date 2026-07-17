@@ -30,7 +30,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  posts Post[]
+  posts    Post[]
+  bookings Booking[]
 
   @@unique([email])
   @@map("user")
@@ -100,4 +101,219 @@ model Post {
 
   @@index([authorId, slug])
   @@map("post")
+}
+
+model PrimaryCategory {
+  id   String @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  name String
+
+  tests     BloodTest[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@map("primary_category")
+}
+
+model SecondaryCategory {
+  id   String @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  name String @default("General")
+
+  tests BloodTest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("secondary_category")
+}
+
+model BloodTest {
+  id              String @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  name            String @unique
+  originalPrice   String
+  discountedPrice String
+  discountAmount  String @default("30")
+
+  isFastingRequired Boolean @default(false)
+
+  primaryCategoryId   String            @db.Uuid
+  primaryCategory     PrimaryCategory   @relation(fields: [primaryCategoryId], references: [id], onDelete: Cascade)
+  secondaryCategoryId String            @db.Uuid
+  secondaryCategory   SecondaryCategory @relation(fields: [secondaryCategoryId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  member   Member? @relation(fields: [memberId], references: [id])
+  memberId String? @db.Uuid
+
+  @@index([name])
+  @@map("blood_test")
+}
+
+model Package {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  name             String
+  description      String
+  cover            String   @default("/packages-bg.png")
+  originalAmount   String
+  discountedAmount String
+  offerAmount      String   @default("30")
+  extraFeatures    String[]
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  packageCategories PackageCategory[]
+
+  @@index([name])
+  @@map("package")
+}
+
+model PackageCategory {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  features  String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  packageId String  @db.Uuid
+  package   Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@map("package_category")
+}
+
+model MiniPackage {
+  id String @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+
+  name             String   @unique
+  description      String
+  cover            String   @default("/packages-bg.png")
+  benefits         String[]
+  originalAmount   String
+  discountedAmount String
+  offerAmount      String   @default("30")
+  extraFeatures    String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([id, name])
+  @@index([name])
+  @@map("mini_package")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum BookingType {
+  COD
+  ONLINE_PAYMENT
+}
+
+model Booking {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  type   BookingType   @default(COD)
+  status BookingStatus @default(PENDING)
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members Member[]
+
+  addressId String  @db.Uuid
+  address   Address @relation(fields: [addressId], references: [id])
+
+  scheduleId String   @db.Uuid
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+
+  @@index([id, userId, addressId, scheduleId])
+  @@map("booking")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model Member {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  name   String
+  email  String
+  phone  String
+  gender Gender
+  age    String
+
+  packages BloodTest[]
+
+  bookingId String  @db.Uuid
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookingId])
+  @@map("member")
+}
+
+enum AddressType {
+  HOME
+  OFFICE
+}
+
+model Address {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  type     AddressType @default(HOME)
+  location String
+  houseNo  String
+  landmark String?
+  pinCode  String
+
+  streetAddress String?
+  city          String?
+  state         String?
+  country       String?
+
+  bookingId String    @db.Uuid
+  bookings  Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type, pinCode])
+  @@map("address")
+}
+
+enum ScheduleStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Schedule {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  scheduleDate   DateTime
+  slot           String
+  scheduleStatus ScheduleStatus @default(PENDING)
+
+  bookingId String    @db.Uuid
+  bookings  Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([scheduleDate, slot, scheduleStatus])
+  @@map("schedule")
 }
