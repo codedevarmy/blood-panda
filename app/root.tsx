@@ -1,4 +1,4 @@
-import clsx from "clsx"
+// import clsx from "clsx"
 import { NuqsAdapter } from "nuqs/adapters/react-router/v7"
 import {
   Links,
@@ -7,19 +7,16 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
-  useLoaderData,
-  useNavigation,
-  type LoaderFunctionArgs,
 } from "react-router"
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes"
+// import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes"
 
 import { TooltipProvider } from "~/components/ui/tooltip"
 import "./app.css"
 
 import type { Route } from "./+types/root"
-import { themeSessionResolver } from "./.server/sessions.server"
+// import { themeSessionResolver } from "./.server/sessions.server"
 import { Toaster } from "./components/ui/sonner"
-import { Spinner } from "./components/ui/spinner"
+// import { Spinner } from "./components/ui/spinner"
 
 // Client-side timing middleware
 const timingMiddleware: Route.ClientMiddlewareFunction = async ({}, next) => {
@@ -34,50 +31,55 @@ export const clientMiddleware: Route.ClientMiddlewareFunction[] = [
 ]
 
 // Return the theme from the session storage using the loader
-export async function loader({ request }: LoaderFunctionArgs) {
-  const { getTheme } = await themeSessionResolver(request)
-  return {
-    theme: getTheme(),
-  }
-}
+// export async function loader({ request }: LoaderFunctionArgs) {
+//   const { getTheme } = await themeSessionResolver(request)
+//   return {
+//     theme: getTheme(),
+//   }
+// }
 
 // Wrap your app with ThemeProvider.
 // `specifiedTheme` is the stored theme in the session storage.
 // `themeAction` is the action name that's used to change the theme in the session storage.
 export default function AppWithProviders() {
-  const data = useLoaderData<typeof loader>()
+  // const data = useLoaderData<typeof loader>()
   return (
-    <ThemeProvider specifiedTheme={data.theme} themeAction="/action/set-theme">
+    <>
+      {/* <ThemeProvider specifiedTheme={data.theme} themeAction="/action/set-theme"> */}
       <App />
-    </ThemeProvider>
+      {/* </ThemeProvider> */}
+    </>
   )
 }
 
 export function App() {
-  const data = useLoaderData<typeof loader>()
-  const [theme] = useTheme()
-  const navigation = useNavigation()
-  const isNavigating = Boolean(navigation.location)
+  // const data = useLoaderData<typeof loader>()
+  // const [theme] = useTheme()
+  // const navigation = useNavigation()
+  // const isNavigating = Boolean(navigation.location)
 
   return (
-    <html lang="en" className={clsx(theme)}>
+    <html
+      lang="en"
+      // className={clsx(theme)}
+    >
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
-        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
+        {/* <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} /> */}
         <Links />
       </head>
       <body className={"relative"}>
         <NuqsAdapter>
           <TooltipProvider>
-            {isNavigating ? (
+            {/* {isNavigating ? (
               <div className="fixed inset-0 z-9999 flex h-screen w-screen animate-pulse items-center justify-center gap-4 bg-accent/50 backdrop-blur-sm">
                 <Spinner className={"size-6"} />
               </div>
             ) : (
-              <Outlet />
-            )}
+            )} */}
+            <Outlet />
           </TooltipProvider>
           <Toaster richColors closeButton position="top-center" />
         </NuqsAdapter>
