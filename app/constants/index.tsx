@@ -754,3 +754,5 @@ export const ScheduleStatusEnums = [
   "CONFIRMED",
   "CANCELLED",
 ] as const
+
+export const PaymentMethodEnums = ["ONLINE_PAYMENT", "COD"] as const

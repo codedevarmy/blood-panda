@@ -1,7 +1,6 @@
 import { MinusCircleIcon, PlusCircleIcon } from "lucide-react"
 import { Controller, useFieldArray, useFormContext } from "react-hook-form"
 import { useFetcher, useLoaderData } from "react-router"
-import { Fragment } from "react/jsx-runtime"
 import { Button } from "~/components/ui/button"
 import {
   Card,
@@ -24,9 +23,11 @@ import { Input } from "~/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
 import { type MemberDetailsFormData } from "~/lib/validators/booking-schema"
 // import type { Route } from "../../../.react-router/types/app/routes/private/+types/booking"
+import { Separator } from "~/components/ui/separator"
 import { GenderEnums } from "~/constants"
 import type { Route } from "../../routes/private/+types/booking"
 import MembersTestItems from "./members-test-items"
+import UploadPrescription from "./upload-prescription"
 
 export default function BasicDetailsStep() {
   const loaderData = useLoaderData<Route.ComponentProps["loaderData"]>()
@@ -50,6 +51,8 @@ export default function BasicDetailsStep() {
       gender: "OTHER",
       age: "0",
       testItems: undefined,
+      isAssignedDoctor: false,
+      assignedDoctor: "no",
     })
   }
 
@@ -58,37 +61,44 @@ export default function BasicDetailsStep() {
   }
 
   return (
-    <>
-      <FieldGroup className={"gap-3"}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Who is getting tested ?</CardTitle>
-          </CardHeader>
+    <FieldGroup className={"gap-3"}>
+      <Card className={"rounded-none shadow-none ring-0"}>
+        <CardHeader>
+          <CardTitle>Who is getting tested ?</CardTitle>
+        </CardHeader>
 
-          {/* <p>{formatCurrency(String(subtotal))}</p> */}
+        {/* <p>{formatCurrency(String(subtotal))}</p> */}
 
-          <CardContent className={"grid grid-cols-1 gap-4 px-4 md:grid-cols-2"}>
-            {fields.map((row, idx) => {
-              return (
-                <Fragment key={row.id}>
-                  <Card>
+        <CardContent className={"px-0"}>
+          {fields.map((row, idx) => {
+            return (
+              <Card
+                key={row.id}
+                className={"rounded-none py-0 shadow-none ring-0"}
+              >
+                <CardContent
+                  className={"grid grid-cols-1 gap-4 px-4 md:grid-cols-2"}
+                >
+                  <Card className={"rounded-none py-0 shadow-none ring-0"}>
                     <CardHeader>
                       <CardTitle>Member {idx + 1}</CardTitle>
-                      <CardAction>
-                        <Button
-                          type="button"
-                          variant={"destructive"}
-                          size="sm"
-                          onClick={() => handleRemoveMember(idx)}
-                          disabled={fields.length === 1}
-                          className={
-                            "disabled:cursor-not-allowed disabled:opacity-50"
-                          }
-                        >
-                          <MinusCircleIcon className={"size-4"} />
-                          Remove member
-                        </Button>
-                      </CardAction>
+                      {idx === 0 ? null : (
+                        <CardAction>
+                          <Button
+                            type="button"
+                            variant={"destructive"}
+                            size="sm"
+                            onClick={() => handleRemoveMember(idx)}
+                            disabled={fields.length === 1}
+                            className={
+                              "disabled:cursor-not-allowed disabled:opacity-50"
+                            }
+                          >
+                            <MinusCircleIcon className={"size-4"} />
+                            Remove member
+                          </Button>
+                        </CardAction>
+                      )}
                     </CardHeader>
                     <CardContent>
                       <FieldGroup className="gap-3">
@@ -238,26 +248,30 @@ export default function BasicDetailsStep() {
                   </Card>
 
                   <MembersTestItems parentIndex={idx} key={row.id} />
-                </Fragment>
-              )
-            })}
-          </CardContent>
 
-          <CardFooter>
-            <Button
-              type="button"
-              variant={"outline"}
-              size="sm"
-              onClick={() => handleAddMember()}
-              disabled={fields.length >= 3}
-              className={"disabled:cursor-not-allowed disabled:opacity-50"}
-            >
-              <PlusCircleIcon className={"size-4"} />
-              Add member
-            </Button>
-          </CardFooter>
-        </Card>
-      </FieldGroup>
-    </>
+                  {/* Upload prescription */}
+                  <UploadPrescription parentIdx={idx} key={row.id} />
+                </CardContent>
+                <Separator className={"mb-4"} />
+              </Card>
+            )
+          })}
+        </CardContent>
+
+        <CardFooter>
+          <Button
+            type="button"
+            variant={"outline"}
+            size="sm"
+            onClick={() => handleAddMember()}
+            disabled={fields.length >= 3}
+            className={"disabled:cursor-not-allowed disabled:opacity-50"}
+          >
+            <PlusCircleIcon className={"size-4"} />
+            Add member
+          </Button>
+        </CardFooter>
+      </Card>
+    </FieldGroup>
   )
 }

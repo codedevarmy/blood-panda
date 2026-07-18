@@ -546,11 +546,7 @@ export default function BookingPage({ loaderData }: Route.ComponentProps) {
   // console.log("prepared", JSON.stringify(prepared))
 
   return (
-    <main className={"mx-auto max-w-(--breakpoint-xl) space-y-8 px-4 py-12"}>
-      <h1 className={"text-3xl font-semibold"}>
-        Create Your first booking, {loaderData.user.name}!
-      </h1>
-
+    <main className={"mx-auto max-w-(--breakpoint-xl) space-y-8 px-4 py-4"}>
       <Suspense fallback={<div>Loading...</div>}>
         <BookingContextProvider>
           <BookingForm />

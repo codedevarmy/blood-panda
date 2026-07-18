@@ -2,7 +2,7 @@ import { IconClock } from "@tabler/icons-react"
 import { format } from "date-fns"
 import { CheckCircle2 } from "lucide-react"
 import { Fragment, useEffect, useState } from "react"
-import { Controller, useFormContext } from "react-hook-form"
+import { Controller, useFormContext, useWatch } from "react-hook-form"
 import { toast } from "sonner"
 
 import { Badge } from "~/components/ui/badge"
@@ -10,7 +10,6 @@ import { Button } from "~/components/ui/button"
 import { Calendar } from "~/components/ui/calendar"
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -36,7 +35,7 @@ function CalendarFooter({
         <p className={"text-sm font-medium"}>
           Selected Date:{" "}
           <Badge className={"font-normal"}>
-            {date ? format(date, "dd MMM yyyy") : "None"}
+            {format(date ?? new Date(), "dd MMM yyyy ccc")}
           </Badge>
         </p>
         <p className={"text-sm font-medium"}>
@@ -48,33 +47,37 @@ function CalendarFooter({
 }
 
 export default function ScheduleSlot() {
-  const [date, setDate] = useState<Date | undefined>(undefined)
+  const today = new Date()
+  const [date, setDate] = useState<Date | undefined>(today)
   const [timeZone, setTimeZone] = useState<string | undefined>(undefined)
   const [slot, setSlot] = useState<string | undefined>(undefined)
-
-  useEffect(() => {
-    setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
-  }, [])
 
   const slots = generateTimeSlots("06:00", "18:00", 15)
 
   const form = useFormContext<BookingFormData>()
 
+  const watchedSchedule = useWatch({
+    name: `schedule`,
+    control: form.control,
+  })
+
   function handleReset() {
-    setDate(undefined)
+    setDate(today)
     setSlot(undefined)
   }
 
+  useEffect(() => {
+    setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+  }, [])
+
   return (
-    <Card className={"mx-auto max-w-2xl gap-3"}>
+    <Card className={"gap-3 rounded-none shadow-none ring-0"}>
       <CardHeader>
         <CardTitle>Schedule a session</CardTitle>
         <CardDescription>
           <p>
-            Select a date and time slot for your booking. All times are in your
-            local timezone:
+            Time Zone: <Badge>{timeZone}</Badge>
           </p>
-          <Badge>{timeZone}</Badge>
         </CardDescription>
       </CardHeader>
 
@@ -90,33 +93,48 @@ export default function ScheduleSlot() {
                 Slot: <Badge>{slot || "Not selected"}</Badge>
               </p>
             </CardDescription> */}
-          <CardContent className={"col-span-4 px-2 ring-1 ring-accent"}>
+          <CardContent
+            className={"col-span-full px-2 ring-1 ring-accent sm:col-span-4"}
+          >
             <Controller
               control={form.control}
               name="schedule.scheduleDate"
-              render={({ field, fieldState }) => (
-                <Calendar
-                  mode="single"
-                  selected={new Date(field.value) || date}
-                  onSelect={(date) => {
-                    setDate(date)
-                    if (date) {
-                      field.onChange(date.toISOString())
-                      setSlot(undefined)
-                    } else {
-                      return toast.warning("Please select a date")
+              render={({ field, fieldState }) => {
+                return (
+                  <Calendar
+                    mode="single"
+                    selected={new Date(field.value) || date}
+                    onSelect={(date) => {
+                      setDate(date)
+                      if (date) {
+                        field.onChange(date.toISOString())
+                        setSlot(undefined)
+                      } else {
+                        return toast.warning("Please select a date")
+                      }
+                    }}
+                    timeZone={timeZone}
+                    className="w-full"
+                    navLayout="after"
+                    disabled={(date) => disablePastDates(date)}
+                    footer={
+                      <CalendarFooter
+                        date={
+                          date ||
+                          new Date(watchedSchedule.scheduleDate) ||
+                          today
+                        }
+                        slot={slot || watchedSchedule.slotTime}
+                      />
                     }
-                  }}
-                  timeZone={timeZone}
-                  className="w-full"
-                  navLayout="after"
-                  disabled={(date) => disablePastDates(date)}
-                  footer={<CalendarFooter date={date} slot={slot} />}
-                />
-              )}
+                  />
+                )
+              }}
             />
           </CardContent>
-          <CardContent className={"col-span-2 px-2 ring-1 ring-accent"}>
+          <CardContent
+            className={"col-span-full px-2 ring-1 ring-accent sm:col-span-2"}
+          >
             <div className={"border-b py-4"}>
               <p className={"col-span-2 text-center text-base font-semibold"}>
                 <span className={"flex items-center justify-center gap-2"}>
@@ -128,14 +146,14 @@ export default function ScheduleSlot() {
               control={form.control}
               name="schedule.slotTime"
               render={({ field, fieldState }) => (
-                <ScrollArea className="h-100 w-full">
+                <ScrollArea className="h-48 w-full sm:h-100">
                   <div className="p-4">
                     {slots.map((slot) => (
                       <Fragment key={slot}>
                         <Button
                           type="button"
                           className="w-full rounded-sm text-sm"
-                          variant={slot === field.value ? "outline" : "ghost"}
+                          variant={slot === field.value ? "default" : "outline"}
                           onClick={() => {
                             setSlot(slot)
                             field.onChange(slot)
@@ -166,14 +184,14 @@ export default function ScheduleSlot() {
             Ready, confirm to book
           </p>
         )}
-        <CardAction>
+        {/* <CardAction>
           <Button size={"sm"} variant={"secondary"} onClick={handleReset}>
             Reset
           </Button>
           <Button size={"sm"} variant={"default"}>
             Book session
           </Button>
-        </CardAction>
+        </CardAction> */}
       </CardFooter>
     </Card>
   )

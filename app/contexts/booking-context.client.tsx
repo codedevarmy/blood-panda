@@ -10,15 +10,28 @@ import {
 import type { Route } from "../routes/private/+types/booking"
 // import { useFormStorage } from "react-hook-form-storage"
 import { useFormPersist } from "@liorpo/react-hook-form-persist"
+import useSessionStorage from "~/hooks/use-session-storage"
+
+type BookingStats = {
+  currentStep: number
+  isFirstStepCompleted: boolean
+  isSecondStepCompleted: boolean
+  isThirdStepCompleted: boolean
+  firstStepProgress: number
+  secondStepProgress: number
+  thirdStepProgress: number
+}
 
 type BookingContextType = {
   step: number
   nextStep: () => void
   prevStep: () => void
-  // clearSavedFormData: () => void
+  canGoToNextStep: boolean
+  canGoToPreviousStep: boolean
+  clearStorage: () => void
 
-  // isLoading: boolean
-  // isRestored: boolean
+  bookingStats: BookingStats
+
   totalPrice: number
   originalPrice: number
   discountedPrice: number
@@ -31,9 +44,28 @@ type BookingContextProviderProps = {
   children: React.ReactNode
 }
 
+const initialValue: BookingStats = {
+  currentStep: 1,
+  isFirstStepCompleted: false,
+  isSecondStepCompleted: false,
+  isThirdStepCompleted: false,
+  firstStepProgress: 0,
+  secondStepProgress: 0,
+  thirdStepProgress: 0,
+}
+
 export function BookingContextProvider(props: BookingContextProviderProps) {
   const { children } = props
-  const [step, setStep] = useState(1) // max 4 steps
+
+  const [bookingStats, setBookingStats] = useSessionStorage({
+    key: "booking-form-stats",
+    initialValue: initialValue,
+  })
+
+  const [step, setStep] = useState(bookingStats.currentStep) // max 4 steps
+
+  const canGoToPreviousStep = step > 1
+  const canGoToNextStep = step < 4
 
   const { user } = useLoaderData<Route.ComponentProps["loaderData"]>()
 
@@ -46,9 +78,11 @@ export function BookingContextProvider(props: BookingContextProviderProps) {
           name: user?.name || "",
           email: user?.email || "",
           phone: "",
-          gender: undefined,
+          gender: "OTHER",
           age: "0",
           testItems: undefined,
+          isAssignedDoctor: false,
+          assignedDoctor: "no",
         },
       ],
       address: {
@@ -57,12 +91,15 @@ export function BookingContextProvider(props: BookingContextProviderProps) {
         landmark: "",
         pincode: "",
         isChecked: false,
-        addressType: undefined,
+        addressType: "HOME",
       },
       schedule: {
         scheduleDate: "",
         slotTime: "",
         scheduleStatus: "PENDING",
+      },
+      reviewOrder: {
+        paymentMode: "COD",
       },
     },
   })
@@ -93,7 +130,7 @@ export function BookingContextProvider(props: BookingContextProviderProps) {
   })
 
   function nextStep() {
-    const validatingForm: Promise<boolean> = new Promise(async (resolve) => {
+    const validatingForm: Promise<boolean> = new Promise(async (res, rej) => {
       const ok =
         step === 1
           ? await formInstance.trigger("memberDetails")
@@ -103,7 +140,11 @@ export function BookingContextProvider(props: BookingContextProviderProps) {
               ? await formInstance.trigger("schedule")
               : true
 
-      resolve(ok)
+      if (ok) {
+        res(true)
+      } else {
+        rej(false)
+      }
     })
 
     toast.promise(validatingForm, {
@@ -111,7 +152,19 @@ export function BookingContextProvider(props: BookingContextProviderProps) {
       success: (result) => {
         if (result) {
           setStep((prev) => Math.min(prev + 1, 4))
+          setBookingStats((prev) => ({
+            ...prev,
+            currentStep: Math.min(prev.currentStep + 1, 4),
+            isFirstStepCompleted: step >= 1,
+            isSecondStepCompleted: step >= 2,
+            isThirdStepCompleted: step >= 3,
+
+            firstStepProgress: step >= 1 ? 100 : 0,
+            secondStepProgress: step >= 2 ? 100 : 0,
+            thirdStepProgress: step >= 3 ? 100 : 0,
+          }))
         }
+        return "Form is valid! Moving to next step..."
       },
       error: "Please fix the errors in the form before proceeding.",
     })
@@ -119,9 +172,20 @@ export function BookingContextProvider(props: BookingContextProviderProps) {
 
   function prevStep() {
     setStep((prev) => Math.max(prev - 1, 1))
+    setBookingStats((prev) => ({
+      ...prev,
+      currentStep: Math.max(prev.currentStep - 1, 1),
+      isFirstStepCompleted: step >= 1,
+      isSecondStepCompleted: step >= 2,
+      isThirdStepCompleted: step >= 3,
+
+      firstStepProgress: step >= 2 ? 100 : 0,
+      secondStepProgress: step >= 3 ? 100 : 0,
+      thirdStepProgress: step >= 4 ? 100 : 0,
+    }))
   }
 
-  const { clear: c } = useFormPersist("my-form", {
+  const { clear: clearStorage } = useFormPersist("booking-form", {
     control: formInstance.control,
     setValue: formInstance.setValue,
     storage: sessionStorage,
@@ -138,40 +202,15 @@ export function BookingContextProvider(props: BookingContextProviderProps) {
     touch: true, // Mark fields as touched
   })
 
-  // const { isRestored, isLoading, save, clear, restore } = useFormStorage(
-  //   "booking-form",
-  //   formInstance,
-  //   {
-  //     // Options go here
-  //     storage: sessionStorage,
-  //     validate: true,
-  //     autoRestore: true,
-  //     dirty: true,
-  //     touched: true,
-  //     autoSave: true,
-  //     debounce: 600,
-  //     onRestore(values) {
-  //       console.log(values)
-  //     },
-  //     onSave(values) {
-  //       console.log(values)
-  //     },
-  //   }
-  // )
-
-  // const onSubmit = (data: FormData) => {
-  //   console.log(data)
-  // }
-
-  // if (isLoading) {
-  //   return <div>Loading saved data...</div>
-  // }
-
   const values: BookingContextType = {
     step,
     nextStep,
     prevStep,
-    // clearSavedFormData: clear,
+    canGoToNextStep,
+    canGoToPreviousStep,
+    clearStorage,
+
+    bookingStats,
 
     // isLoading,
     // isRestored,

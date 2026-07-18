@@ -1,5 +1,10 @@
 import z from "zod"
-import { AddressTypeEnums, GenderEnums, ScheduleStatusEnums } from "~/constants"
+import {
+  AddressTypeEnums,
+  GenderEnums,
+  PaymentMethodEnums,
+  ScheduleStatusEnums,
+} from "~/constants"
 
 export const testItemSchema = z.object({
   id: z.string(),
@@ -19,6 +24,8 @@ const memberDetailsField = z.object({
   gender: z.enum(GenderEnums),
   age: z.string(),
   testItems: z.array(testItemSchema).optional(),
+  isAssignedDoctor: z.boolean().default(false),
+  assignedDoctor: z.enum(["yes", "no"]).default("no"),
 })
 
 export const memberDetailsFormSchema = z.object({
@@ -42,10 +49,15 @@ export const scheduleFormSchema = z.object({
   scheduleStatus: z.enum(ScheduleStatusEnums).default("PENDING"),
 })
 
+export const reviewOrderSchema = z.object({
+  paymentMode: z.enum(PaymentMethodEnums).default("ONLINE_PAYMENT"),
+})
+
 export const bookingFormSchema = z.object({
   ...memberDetailsFormSchema.shape,
   address: addressFormSchema,
   schedule: scheduleFormSchema,
+  reviewOrder: reviewOrderSchema,
 })
 
 export type TestItem = z.infer<typeof testItemSchema>
