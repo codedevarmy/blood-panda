@@ -4,7 +4,7 @@ import {
   IconChevronLeft,
   IconChevronRight,
 } from "@tabler/icons-react"
-import { readFile } from "fs/promises"
+import fs from "fs"
 import { CheckCircle2Icon } from "lucide-react"
 import { Link } from "react-router"
 import {
@@ -36,11 +36,31 @@ export function meta({ params }: Route.MetaArgs) {
 }
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const packageDetails = await readFile(
+  // const packageDetails = await readFile(
+  //   `./app/constants/packages/${params.package}.json`,
+  //   "utf-8"
+  // ).then((res) => JSON.parse(res))
+
+  let data = null
+
+  fs.readFile(
     `./app/constants/packages/${params.package}.json`,
-    "utf-8"
-  ).then((res) => JSON.parse(res))
-  return packageDetails
+    (err, data) => {
+      if (err) {
+        console.error("Error reading file:", err)
+        return null
+      }
+      try {
+        const parsedData = JSON.parse(data.toString())
+        data = parsedData
+        return data
+      } catch (parseErr) {
+        console.error("Error parsing JSON:", parseErr)
+        return null
+      }
+    }
+  )
+  return data
 }
 
 export default function PackagePage({
@@ -48,7 +68,7 @@ export default function PackagePage({
   loaderData,
 }: Route.ComponentProps) {
   const packageSlug = params.package
-  const data = loaderData as PackageDetails
+  const data = loaderData as unknown as PackageDetails
 
   return (
     <main className={"mx-auto max-w-(--breakpoint-xl) space-y-8 px-4 py-12"}>

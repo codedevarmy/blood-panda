@@ -1,6 +1,6 @@
 import "dotenv/config"
 
-import fs from "fs/promises"
+import fs from "fs"
 import { join } from "path"
 import { type ActionFunctionArgs } from "react-router"
 import { createPayment, createWebhook, updateBooking } from "~/.server/actions"
@@ -67,7 +67,18 @@ export async function action({ request, context }: ActionFunctionArgs) {
   if (callbackResponse.type.toString() === "CHECKOUT_ORDER_COMPLETED") {
     console.log("Order completed:", callbackResponse.type)
 
-    await fs.writeFile(joinedPath, JSON.stringify(callbackResponse, null, 2))
+    // await fs.writeFile(joinedPath, JSON.stringify(callbackResponse, null, 2))
+    fs.writeFile(
+      joinedPath,
+      JSON.stringify(callbackResponse, null, 2),
+      (err) => {
+        if (err) {
+          console.error("Error writing file:", err)
+        } else {
+          console.log("File written successfully:", joinedPath)
+        }
+      }
+    )
 
     const userId = callbackResponse.payload.metaInfo?.udf1 // userId
     const bookingId = callbackResponse.payload.metaInfo?.udf2 // bookingId

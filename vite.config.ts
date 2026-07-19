@@ -7,6 +7,7 @@ import { reactRouterDevTools } from "react-router-devtools"
 import { defineConfig } from "vite"
 import { envOnlyMacros } from "vite-env-only"
 import devtoolsJson from "vite-plugin-devtools-json"
+// import { nodePolyfills } from "vite-plugin-node-polyfills"
 import relay from "vite-plugin-relay"
 
 // export default defineConfig({
@@ -15,6 +16,7 @@ import relay from "vite-plugin-relay"
 // })
 
 export default defineConfig((opts) => ({
+  envDir: "./",
   build: {
     rolldownOptions: {
       // renamed from rollupOptions
@@ -47,6 +49,27 @@ export default defineConfig((opts) => ({
   // },
   resolve: { tsconfigPaths: true },
   plugins: [
+    // nodePolyfills({
+    //   // To add only specific polyfills, add them here. If no option is passed, adds all polyfills
+    //   include: ["path"],
+    //   // To exclude specific polyfills, add them to this list. Note: if include is provided, this has no effect
+    //   exclude: [
+    //     "http", // Excludes the polyfill for `http` and `node:http`.
+    //   ],
+    //   // Whether to polyfill specific globals.
+    //   globals: {
+    //     Buffer: true, // can also be 'build', 'dev', or false
+    //     global: true,
+    //     process: true,
+    //   },
+    //   // Override the default polyfills for specific modules.
+    //   overrides: {
+    //     // Since `fs` is not supported in browsers, we can use the `memfs` package to polyfill it.
+    //     fs: "memfs",
+    //   },
+    //   // Whether to polyfill `node:` protocol imports.
+    //   protocolImports: true,
+    // }),
     reactRouterDevTools({
       includeInProd: {
         client: false,
@@ -64,7 +87,7 @@ export default defineConfig((opts) => ({
     devtoolsJson({ uuid: crypto.randomUUID() }),
     // denyImports({
     //   client: {
-    //     specifiers: ["fs-extra", /^node:/, "@prisma/*", "drizzle-orm/*"],
+    //     specifiers: ["fs-extra", /^node:/, "@prisma/*"],
     //     files: ["**/.server/*", "**/*.server.*"],
     //   },
     //   server: {

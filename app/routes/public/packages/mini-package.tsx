@@ -1,4 +1,4 @@
-import { readFile } from "fs/promises"
+import fs from "fs"
 
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react"
 import { CheckCircle2Icon } from "lucide-react"
@@ -57,13 +57,24 @@ export async function loader({ params, devTools }: LoaderFunctionArgs) {
   // tracing is a set of utilities to be used in your data fetching functions to trace events
   // in network tab of react-router-devtools
   const end = tracing?.start("loader: mini-package")
-  const packageDetails = await readFile(
-    `${path}/${params.miniPackage}.json`,
-    "utf-8"
-  ).then((res) => JSON.parse(res))
+  // const packageDetails = await readFile(
+  //   `${path}/${params.miniPackage}.json`,
+  //   "utf-8"
+  // ).then((res) => JSON.parse(res))
+
+  let plan = null
+  fs.readFile(`${path}/${params.miniPackage}.json`, (err, data) => {
+    if (err) {
+      console.error("Error reading file:", err)
+      return null
+    }
+    plan = data
+    return JSON.parse(plan.toString())
+  })
+
   end?.()
   console.log("loader: mini-package", { routeId })
-  return packageDetails
+  return plan
 }
 
 export default function MiniPackage({
@@ -71,7 +82,7 @@ export default function MiniPackage({
   loaderData,
 }: Route.ComponentProps) {
   const packageName = params.miniPackage
-  const data = loaderData as MiniPackage
+  const data = loaderData as unknown as MiniPackage
 
   return (
     <main className={"mx-auto max-w-(--breakpoint-xl) space-y-8 px-4 py-12"}>
